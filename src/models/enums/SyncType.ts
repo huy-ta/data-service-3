@@ -1,0 +1,7 @@
+enum SyncType {
+  ALL_USERS_SYNC = 'ALL_USERS_SYNC',
+  MULTIPLE_USERS_SYNC = 'MULTIPLE_USERS_SYNC',
+  SINGLE_USER_SYNC = 'SINGLE_USER_SYNC'
+}
+
+export default SyncType;
