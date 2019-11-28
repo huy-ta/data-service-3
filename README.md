@@ -1,6 +1,6 @@
 # Data Service (User & Department)
 
-- Live Demo: https://falling-frog-38743.pktriot.net
+- Live Demo: https://dms3.pagekite.me
 
 ## How to run the application
 
@@ -15,4 +15,10 @@ npm install
 
 ```
 docker-compose up
+```
+
+- If it is the first time you're running the app, you might want to sync all data first:
+
+```
+curl -X POST localhost:7070/users/sync-all
 ```
