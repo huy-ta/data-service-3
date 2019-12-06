@@ -1,7 +1,8 @@
 enum TAGS {
   HELLO = 'hello',
   USERS = 'users',
-  SYNC_STATES = 'sync states'
+  SYNC_STATES = 'sync states',
+  DEPARTMENTS = 'departments'
 }
 
 const tags = [
@@ -16,6 +17,10 @@ const tags = [
   {
     name: TAGS.USERS,
     description: 'Operations on users'
+  },
+  {
+    name: TAGS.DEPARTMENTS,
+    description: 'Operations on departments'
   }
 ];
 

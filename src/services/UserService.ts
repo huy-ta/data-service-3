@@ -6,8 +6,12 @@ class UserService {
   public static async syncUsersFromScratch() {
     await UserModel.deleteMany({});
 
+    console.log('URL', CONFIG.API_URL.USERS.GET_ALL);
+
     const response = await fetch(CONFIG.API_URL.USERS.GET_ALL);
     const body = await response.json();
+
+    console.log(body);
 
     return await Promise.all(body.map(user => UserService.createNewUser(user)));
   }

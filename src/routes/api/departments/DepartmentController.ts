@@ -2,80 +2,80 @@ import { RouteOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { ServerResponse } from 'http';
 import BaseController from '@routes/BaseController';
 import { TAGS } from '@schemas/common/tags';
-import UserService from '@services/UserService';
+import DepartmentService from '@services/DepartmentService';
 import SyncStateService from '@state/SyncStateService';
 import { DEFAULT_USER } from '@constants/common';
 import SyncType from '@models/enums/SyncType';
 import SyncStatus from '@models/enums/SyncStatus';
-import UserModel from '@models/User';
+import DepartmentModel from '@models/Department';
 import NotFound404 from '@models/responses/NotFound404';
 
-class UserController extends BaseController {
+class DepartmentController extends BaseController {
   public getRoutes(): RouteOptions[] {
     return [
       {
         method: 'GET',
         url: '/',
-        handler: this.getAllUsers,
+        handler: this.getAllDepartments,
         schema: {
-          tags: [TAGS.USERS]
+          tags: [TAGS.DEPARTMENTS]
         }
       },
       {
         method: 'GET',
-        url: '/:userId',
-        handler: this.getUser,
+        url: '/:departmentId',
+        handler: this.getDepartment,
         schema: {
-          tags: [TAGS.USERS]
+          tags: [TAGS.DEPARTMENTS]
         }
       },
       {
         method: 'POST',
         url: '/all-sync',
-        handler: this.syncUsersFromScratch,
+        handler: this.syncDepartmentsFromScratch,
         schema: {
-          tags: [TAGS.USERS],
+          tags: [TAGS.DEPARTMENTS],
         }
       },
       {
         method: 'POST',
         url: '/single-sync',
-        handler: this.syncSingleUser,
+        handler: this.syncSingleDepartment,
         schema: {
-          tags: [TAGS.USERS]
+          tags: [TAGS.DEPARTMENTS]
         }
       },
       {
         method: 'POST',
         url: '/multiple-sync',
-        handler: this.syncMultipleUsers,
+        handler: this.syncMultipleDepartments,
         schema: {
-          tags: [TAGS.USERS]
+          tags: [TAGS.DEPARTMENTS]
         }
       }
     ];
   }
 
-  private async getAllUsers(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const users = await UserModel.find({});
+  private async getAllDepartments(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const departments = await DepartmentModel.find({});
 
-    return reply.send(users);
+    return reply.send(departments);
   }
 
-  private async getUser(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const user = await UserModel.findOne({ id: request.params.userId });
+  private async getDepartment(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const department = await DepartmentModel.findOne({ id: request.params.departmentId });
 
-    if (!user) {
-      return reply.status(404).send(NotFound404.generate(`User with id '${request.params.userId}' was not found`));
+    if (!department) {
+      return reply.status(404).send(NotFound404.generate(`Department with id '${request.params.departmentId}' was not found`));
     }
 
-    return reply.send(user);
+    return reply.send(department);
   }
 
-  private async syncUsersFromScratch(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const newSyncState = await SyncStateService.createNewSyncState({ type: SyncType.ALL_USERS_SYNC, issuedBy: DEFAULT_USER });
+  private async syncDepartmentsFromScratch(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const newSyncState = await SyncStateService.createNewSyncState({ type: SyncType.ALL_DEPARTMENTS_SYNC, issuedBy: DEFAULT_USER });
 
-    UserService.syncUsersFromScratch()
+    DepartmentService.syncDepartmentsFromScratch()
       .then(() => {
         SyncStateService.updateSyncStateById(newSyncState._id, { status: SyncStatus.SUCCESSFUL });
       })
@@ -84,21 +84,21 @@ class UserController extends BaseController {
       });
 
     reply.send({ 
-      message: 'The request to synchronize all users has been accepted',
+      message: 'The request to synchronize all departments has been accepted',
       syncState: newSyncState
     });
   }
 
-  private async syncMultipleUsers(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const { userIds } = request.body;
+  private async syncMultipleDepartments(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const { departmentIds } = request.body;
 
     const newSyncState = await SyncStateService.createNewSyncState({ 
-      type: SyncType.MULTIPLE_USERS_SYNC,
+      type: SyncType.MULTIPLE_DEPARTMENTS_SYNC,
       issuedBy: DEFAULT_USER,
-      details: { userIds }
+      details: { departmentIds }
     });
 
-    UserService.syncMultipleUsers(request.body.userIds)
+    DepartmentService.syncMultipleDepartments(request.body.departmentIds)
       .then(() => {
         SyncStateService.updateSyncStateById(newSyncState._id, { status: SyncStatus.SUCCESSFUL });
       })
@@ -107,21 +107,21 @@ class UserController extends BaseController {
       });
 
     reply.send({ 
-      message: 'The request to synchronize multiple users has been accepted',
+      message: 'The request to synchronize multiple departments has been accepted',
       syncStateId: newSyncState._id
     });
   }
 
-  private async syncSingleUser(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const { userId } = request.body;
+  private async syncSingleDepartment(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const { departmentId } = request.body;
 
     const newSyncState = await SyncStateService.createNewSyncState({
       type: SyncType.SINGLE_USER_SYNC,
       issuedBy: DEFAULT_USER,
-      details: { userId }
+      details: { departmentId }
     });
 
-    UserService.syncSingleUser(userId)
+    DepartmentService.syncSingleDepartment(departmentId)
       .then(() => {
         SyncStateService.updateSyncStateById(newSyncState._id, { status: SyncStatus.SUCCESSFUL });
       })
@@ -136,4 +136,4 @@ class UserController extends BaseController {
   }
 }
 
-export default new UserController().initialize;
+export default new DepartmentController().initialize;
