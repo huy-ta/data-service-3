@@ -4,16 +4,38 @@ import CONFIG from '@constants/config';
 
 class DepartmentService {
   public static async syncDepartmentsFromScratch() {
-    await DepartmentModel.deleteMany({});
+    const session = await DepartmentModel.startSession();
 
-    const response = await fetch(CONFIG.API_URL.DEPARTMENTS.GET_ALL);
-    const body = await response.json();
+    session.startTransaction();
 
-    return await Promise.all(body.map(department => DepartmentService.createNewDepartment(department)));
+    try {
+      await DepartmentModel.deleteMany({});
+
+      const response = await fetch(CONFIG.API_URL.DEPARTMENTS.GET_ALL);
+      const body = await response.json();
+
+      await Promise.all(body.map(department => DepartmentService.createNewDepartment(department)));
+
+      session.commitTransaction();
+    } catch (err) {
+      session.abortTransaction();
+      throw err;
+    }
   }
 
   public static async syncMultipleDepartments(departmentIds) {
-    return Promise.all(departmentIds.map(departmentId => DepartmentService.syncSingleDepartment(departmentId)));
+    const session = await DepartmentModel.startSession();
+
+    session.startTransaction();
+
+    try {
+      await Promise.all(departmentIds.map(departmentId => DepartmentService.syncSingleDepartment(departmentId)));
+
+      session.commitTransaction();
+    } catch (err) {
+      session.abortTransaction();
+      throw err;
+    }
   }
 
   public static async syncSingleDepartment(departmentId) {

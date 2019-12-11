@@ -4,20 +4,38 @@ import CONFIG from '@constants/config';
 
 class UserService {
   public static async syncUsersFromScratch() {
-    await UserModel.deleteMany({});
+    const session = await UserModel.startSession();
 
-    console.log('URL', CONFIG.API_URL.USERS.GET_ALL);
+    session.startTransaction();
 
-    const response = await fetch(CONFIG.API_URL.USERS.GET_ALL);
-    const body = await response.json();
+    try {
+      await UserModel.deleteMany({});
 
-    console.log(body);
+      const response = await fetch(CONFIG.API_URL.USERS.GET_ALL);
+      const body = await response.json();
 
-    return await Promise.all(body.map(user => UserService.createNewUser(user)));
+      await Promise.all(body.map(user => UserService.createNewUser(user)));
+
+      session.commitTransaction();
+    } catch (err) {
+      session.abortTransaction();
+      throw err;
+    }
   }
 
   public static async syncMultipleUsers(userIds) {
-    return Promise.all(userIds.map(userId => UserService.syncSingleUser(userId)));
+    const session = await UserModel.startSession();
+
+    session.startTransaction();
+
+    try {
+      await Promise.all(userIds.map(userId => UserService.syncSingleUser(userId)));
+
+      session.commitTransaction();
+    } catch (err) {
+      session.abortTransaction();
+      throw err;
+    }
   }
 
   public static async syncSingleUser(userId) {
@@ -62,7 +80,10 @@ class UserService {
       lastUpdate: user.lastUpdate
     });
 
-    if (user.gender) newUser.gender = user.gender;
+    if (user.gender) {
+      if (user.gender === 'Nữ') user.gender = 'Nu';
+      newUser.gender = user.gender;
+    }
 
     await newUser.save();
 
