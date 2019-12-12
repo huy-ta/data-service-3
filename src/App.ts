@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 
 import APIRoutes from '@routes/Routes';
 import CommonSchemaTags from '@schemas/common/tags';
+import globalPublisher from '@pubsub/global/Publisher';
 
 class App {
   public fastifyApp: fastify.FastifyInstance;
@@ -17,6 +18,7 @@ class App {
 
     this.connectToDatabase();
     this.configPreRouteMiddlewares();
+    this.setUpRabbitMQ();
     this.setUpSwagger();
     this.setUpAPIRoutes();
     this.configPostRouteMiddlewares();
@@ -49,7 +51,7 @@ class App {
       swagger: {
         info: {
           title: 'Data Microservice - API Documentation',
-          version: '0.0.1',
+          version: '0.1.0',
           description: 'This is the API documentation for the microservice managing data for users and departments.'
         },
         consumes: ['application/json'],
@@ -61,6 +63,13 @@ class App {
     });
 
     this.fastifyApp.log.info('Swagger Docs is successfully generated and available at /api-docs.');
+  }
+
+  private setUpRabbitMQ() {
+    this.fastifyApp.log.info('Setting up RabbitMQ...');
+
+    globalPublisher.createQueue('user_sync', { durable: true });
+    globalPublisher.createQueue('department_sync', { durable: true });
   }
 
   private setUpAPIRoutes(): void {

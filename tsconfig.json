@@ -18,7 +18,8 @@
       "@schemas/*": ["src/schemas/*"],
       "@constants/*": ["src/constants/*"],
       "@services/*": ["src/services/*"],
-      "@state/*": ["src/state/*"]
+      "@state/*": ["src/state/*"],
+      "@pubsub/*": ["src/pubsub/*"]
     },
     "lib": ["es2017", "dom"]
   },

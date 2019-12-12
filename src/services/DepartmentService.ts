@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import DepartmentModel from '@models/Department';
 import CONFIG from '@constants/config';
+import globalPublisher from '@pubsub/global/Publisher';
 
 class DepartmentService {
   public static async syncDepartmentsFromScratch() {
@@ -63,6 +64,8 @@ class DepartmentService {
     });
 
     await existingDepartment.save();
+
+    globalPublisher.sendToQueue('department_sync', JSON.stringify(existingDepartment));
 
     return existingDepartment;
   }

@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import UserModel from '@models/User';
 import CONFIG from '@constants/config';
+import globalPublisher from '@pubsub/global/Publisher';
 
 class UserService {
   public static async syncUsersFromScratch() {
@@ -63,6 +64,8 @@ class UserService {
     });
 
     await existingUser.save();
+
+    globalPublisher.sendToQueue('user_sync', JSON.stringify(existingUser));
 
     return existingUser;
   }
