@@ -37,7 +37,11 @@ class Publisher {
     this.logger.info(`Connecting to RabbitMQ at ${amqpUri}...`);
 
     return this.setUpRabbitMQ(amqpUri)
-      .then(() => this.logger.info('RabbitMQ connected'))
+      .then(() => {
+        this.logger.info('RabbitMQ connected');
+        this.createQueue('user_sync', { durable: true });
+        this.createQueue('department_sync', { durable: true });
+      })
       .catch(() => {
         this.logger.info('Trying to reconnect to RabbitMQ in 1000ms...');
 

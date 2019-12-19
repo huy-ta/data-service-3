@@ -4,6 +4,7 @@ import UserStatus from './enums/UserStatus';
 import Publisher from '@pubsub/global/Publisher';
 
 @post<User>('save', user => {
+  console.log('User saved', JSON.stringify(user));
   Publisher.sendToQueue('user_sync', JSON.stringify(user));
 })
 class User {

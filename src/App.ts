@@ -77,8 +77,6 @@ class App {
     this.fastifyApp.log.info('Setting up RabbitMQ...');
 
     globalPublisher.setLogger(this.fastifyApp.log);
-    globalPublisher.createQueue('user_sync', { durable: true });
-    globalPublisher.createQueue('department_sync', { durable: true });
   }
 
   private setUpAPIRoutes(): void {
