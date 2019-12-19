@@ -20,6 +20,7 @@
     "fastify-cors": "^3.0.0",
     "fastify-swagger": "^2.4.0",
     "mongoose": "^5.7.5",
+    "node-cron": "^2.0.3",
     "node-fetch": "^2.6.0",
     "pino-pretty": "^3.2.1"
   },

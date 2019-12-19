@@ -1,6 +1,13 @@
 version: '3'
 services:
 
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    network_mode: host
+
   app:
     build:
       context: ./
@@ -11,31 +18,19 @@ services:
       - .:/usr/src/app
     environment:
       HOST: 0.0.0.0 
-      PORT: 8080
-      MONGO_URI: "mongodb://mongo:27017/dms3"
-      AMQP_URI: "amqp://rabbit:5672"
+      PORT: 7070
+      MONGO_URI: "mongodb://172.17.0.1:28018/dms3"
+      AMQP_URI: "amqp://172.17.0.1:5672"
     ports:
-      - '7070:8080'
+      - '7070:7070'
     depends_on:
       - 'rabbit'
-    networks:
-      - app_network
+    network_mode: host
 
   mongo:
     image: mongo:4.2
+    command: mongod --port 28018
     ports:
-      - '28018:27017'
-    networks:
-      - app_network
+      - '28018:28018'
+    network_mode: host
 
-  rabbit:
-    image: rabbitmq:3-management
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    networks:
-      - app_network
-
-networks:
-  app_network:
-    driver: bridge
