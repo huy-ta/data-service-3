@@ -1,7 +1,11 @@
-import { prop, getModelForClass } from '@typegoose/typegoose';
+import { prop, post, getModelForClass } from '@typegoose/typegoose';
 import Gender from './enums/Gender';
 import UserStatus from './enums/UserStatus';
+import Publisher from '@pubsub/global/Publisher';
 
+@post<User>('save', user => {
+  Publisher.sendToQueue('user_sync', JSON.stringify(user));
+})
 class User {
   @prop({ unique: true, required: true, index: true })
   public id!: number;
