@@ -70,6 +70,6 @@ class Publisher {
   }
 }
 
-const AMQP_URI = process.env.AMQP_URI || 'amqp://localhost:5672';
+const AMQP_URI = process.env.AMQP_URI || 'amqp://0.0.0.0:5672';
 
 export default new Publisher(AMQP_URI);

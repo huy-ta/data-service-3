@@ -19,8 +19,8 @@ services:
     environment:
       HOST: 0.0.0.0 
       PORT: 7070
-      MONGO_URI: "mongodb://172.17.0.1:28018/dms3"
-      AMQP_URI: "amqp://172.17.0.1:5672"
+      MONGO_URI: "mongodb://0.0.0.0:28018/dms3"
+      AMQP_URI: "amqp://0.0.0.0:5672"
     ports:
       - '7070:7070'
     depends_on:
