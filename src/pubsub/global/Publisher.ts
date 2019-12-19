@@ -34,6 +34,8 @@ class Publisher {
   }
 
   private async initialize(amqpUri) {
+    this.logger.info(`Connecting to RabbitMQ at ${amqpUri}...`);
+
     return this.setUpRabbitMQ(amqpUri)
       .then(() => this.logger.info('RabbitMQ connected'))
       .catch(() => {

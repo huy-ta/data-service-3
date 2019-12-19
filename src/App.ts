@@ -44,7 +44,7 @@ class App {
     const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:28018/dms3';
 
     try {
-      this.fastifyApp.log.info('Connecting to MongoDB...');
+      this.fastifyApp.log.info(`Connecting to MongoDB at ${mongoURI}...`);
       await mongoose.connect(mongoURI, { useUnifiedTopology: true, useNewUrlParser: true });
       this.fastifyApp.log.info('MongoDB connected.');
     } catch (err) {
@@ -102,6 +102,7 @@ class App {
     });
 
     cron.schedule("0 */50 * * * *", async () => {
+      this.fastifyApp.log.info('Syncing users from Department Service...');
       const newSyncState = await SyncStateService.createNewSyncState({ type: SyncType.ALL_DEPARTMENTS_SYNC, issuedBy: DEFAULT_USER });
 
       DepartmentService.syncDepartmentsFromScratch()
